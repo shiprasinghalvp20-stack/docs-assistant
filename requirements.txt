@@ -13,3 +13,6 @@ pydantic-settings>=2.4
 pypdf>=5.0
 langchain-core>=0.3  # Document type shared by all later steps
 fpdf2>=2.7           # only for generating test/sample PDFs
+
+# --- Step 4: chunking ---
+langchain-text-splitters>=0.3

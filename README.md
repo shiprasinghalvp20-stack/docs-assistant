@@ -74,6 +74,15 @@ python -m app.services.pdf_loader samples/company_handbook.pdf
 
 Pages with no text (usually scanned images) are reported as warnings; OCR is not supported yet.
 
+## Preview chunking
+
+See how a PDF is split into chunks (defaults come from `CHUNK_SIZE` / `CHUNK_OVERLAP` in `.env`):
+
+```bash
+python -m app.services.chunker samples/company_handbook.pdf
+python -m app.services.chunker samples/company_handbook.pdf --size 200 --overlap 40
+```
+
 ## Test
 
 ```bash
@@ -85,7 +94,7 @@ pytest -v
 - [x] Step 1 – Architecture and project skeleton
 - [x] Step 2 – Configuration from `.env` (pydantic-settings)
 - [x] Step 3 – PDF loading (text + page numbers)
-- [ ] Step 4 – Chunking
+- [x] Step 4 – Chunking (RecursiveCharacterTextSplitter)
 - [ ] Step 5 – Embeddings + ChromaDB storage
 - [ ] Step 6 – Retrieval (vector search)
 - [ ] Step 7 – Answer generation with citations

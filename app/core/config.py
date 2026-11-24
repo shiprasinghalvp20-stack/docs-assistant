@@ -12,7 +12,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import SecretStr
+from pydantic import Field, SecretStr, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -33,6 +33,20 @@ class Settings(BaseSettings):
     # --- Storage ---
     upload_dir: Path = Path("data/uploads")
     chroma_dir: Path = Path("data/chroma")
+
+    # --- Chunking (measured in characters) ---
+    # Field(gt=0) / ge=0 = pydantic rejects zero or negative values at startup.
+    chunk_size: int = Field(default=800, gt=0)
+    chunk_overlap: int = Field(default=120, ge=0)
+
+    @model_validator(mode="after")
+    def _overlap_smaller_than_size(self) -> "Settings":
+        if self.chunk_overlap >= self.chunk_size:
+            raise ValueError(
+                f"CHUNK_OVERLAP ({self.chunk_overlap}) must be smaller than "
+                f"CHUNK_SIZE ({self.chunk_size})."
+            )
+        return self
 
     def llm_api_key(self) -> str:
         """Return the API key for the selected provider, or raise a clear error.

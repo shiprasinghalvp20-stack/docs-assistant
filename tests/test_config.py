@@ -5,7 +5,10 @@ from pydantic import ValidationError
 
 from app.core.config import Settings, get_settings
 
-ENV_VARS = ["LLM_PROVIDER", "GROQ_API_KEY", "GOOGLE_API_KEY", "UPLOAD_DIR", "CHROMA_DIR"]
+ENV_VARS = [
+    "LLM_PROVIDER", "GROQ_API_KEY", "GOOGLE_API_KEY", "UPLOAD_DIR", "CHROMA_DIR",
+    "CHUNK_SIZE", "CHUNK_OVERLAP",
+]
 FAKE_KEY = "test-fake-key-123"
 
 
@@ -30,6 +33,8 @@ def test_defaults_when_nothing_is_set():
     assert s.groq_api_key is None
     assert s.upload_dir == Path("data/uploads")
     assert s.chroma_dir == Path("data/chroma")
+    assert s.chunk_size == 800
+    assert s.chunk_overlap == 120
 
 
 def test_environment_variables_override_defaults(monkeypatch):
@@ -76,3 +81,21 @@ def test_missing_or_placeholder_key_gives_clear_error(monkeypatch, value):
 
 def test_get_settings_returns_same_object():
     assert get_settings() is get_settings()
+
+
+def test_chunk_settings_are_converted_to_int(monkeypatch):
+    monkeypatch.setenv("CHUNK_SIZE", "500")
+    monkeypatch.setenv("CHUNK_OVERLAP", "50")
+    s = make_settings()
+    assert (s.chunk_size, s.chunk_overlap) == (500, 50)
+
+
+@pytest.mark.parametrize(
+    "size, overlap",
+    [("0", "0"), ("-5", "0"), ("100", "-1"), ("100", "100"), ("100", "200"), ("abc", "10")],
+)
+def test_invalid_chunk_settings_fail_at_startup(monkeypatch, size, overlap):
+    monkeypatch.setenv("CHUNK_SIZE", size)
+    monkeypatch.setenv("CHUNK_OVERLAP", overlap)
+    with pytest.raises(ValidationError):
+        make_settings()
