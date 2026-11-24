@@ -7,7 +7,7 @@ from app.core.config import Settings, get_settings
 
 ENV_VARS = [
     "LLM_PROVIDER", "GROQ_API_KEY", "GOOGLE_API_KEY", "UPLOAD_DIR", "CHROMA_DIR",
-    "CHUNK_SIZE", "CHUNK_OVERLAP",
+    "CHUNK_SIZE", "CHUNK_OVERLAP", "EMBEDDING_MODEL", "COLLECTION_NAME",
 ]
 FAKE_KEY = "test-fake-key-123"
 
@@ -35,6 +35,8 @@ def test_defaults_when_nothing_is_set():
     assert s.chroma_dir == Path("data/chroma")
     assert s.chunk_size == 800
     assert s.chunk_overlap == 120
+    assert s.embedding_model == "sentence-transformers/all-MiniLM-L6-v2"
+    assert s.collection_name == "docs"
 
 
 def test_environment_variables_override_defaults(monkeypatch):

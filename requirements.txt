@@ -16,3 +16,8 @@ fpdf2>=2.7           # only for generating test/sample PDFs
 
 # --- Step 4: chunking ---
 langchain-text-splitters>=0.3
+
+# --- Step 5: embeddings + vector store ---
+chromadb>=0.5
+sentence-transformers>=3.0   # pulls in PyTorch (large download)
+langchain-huggingface>=0.1

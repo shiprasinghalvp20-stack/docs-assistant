@@ -83,6 +83,16 @@ python -m app.services.chunker samples/company_handbook.pdf
 python -m app.services.chunker samples/company_handbook.pdf --size 200 --overlap 40
 ```
 
+## Index PDFs into the vector store
+
+```bash
+python -m app.services.ingestion samples/company_handbook.pdf
+```
+
+Vectors are saved in `data/chroma`. Re-running on an unchanged file is skipped;
+a changed file with the same name replaces its old chunks.
+The first run downloads the embedding model (~90 MB) once; after that it loads offline.
+
 ## Test
 
 ```bash
@@ -95,7 +105,7 @@ pytest -v
 - [x] Step 2 – Configuration from `.env` (pydantic-settings)
 - [x] Step 3 – PDF loading (text + page numbers)
 - [x] Step 4 – Chunking (RecursiveCharacterTextSplitter)
-- [ ] Step 5 – Embeddings + ChromaDB storage
+- [x] Step 5 – Embeddings + ChromaDB storage (local all-MiniLM-L6-v2)
 - [ ] Step 6 – Retrieval (vector search)
 - [ ] Step 7 – Answer generation with citations
 - [ ] Step 8 – Upload and Ask API endpoints

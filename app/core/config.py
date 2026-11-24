@@ -34,6 +34,11 @@ class Settings(BaseSettings):
     upload_dir: Path = Path("data/uploads")
     chroma_dir: Path = Path("data/chroma")
 
+    # --- Embeddings + vector store ---
+    # Changing the model requires re-indexing: vectors from different models can't be mixed.
+    embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
+    collection_name: str = "docs"
+
     # --- Chunking (measured in characters) ---
     # Field(gt=0) / ge=0 = pydantic rejects zero or negative values at startup.
     chunk_size: int = Field(default=800, gt=0)
