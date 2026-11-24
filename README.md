@@ -36,6 +36,8 @@ app/
   api/             HTTP routes (thin layer)
   core/            configuration (reads .env)
   services/        ingestion, retrieval, generation logic
+scripts/          helper scripts (e.g. make_sample_pdf.py)
+samples/          small fictional PDF for demos and tests
 tests/             pytest tests
 eval/              retrieval accuracy evaluation
 data/uploads/      uploaded PDFs (git-ignored)
@@ -62,6 +64,16 @@ uvicorn app.main:app --reload
 
 Open http://127.0.0.1:8000/docs for the interactive API.
 
+## Preview PDF extraction
+
+See exactly what text is extracted from each page of a PDF:
+
+```bash
+python -m app.services.pdf_loader samples/company_handbook.pdf
+```
+
+Pages with no text (usually scanned images) are reported as warnings; OCR is not supported yet.
+
 ## Test
 
 ```bash
@@ -72,7 +84,7 @@ pytest -v
 
 - [x] Step 1 – Architecture and project skeleton
 - [x] Step 2 – Configuration from `.env` (pydantic-settings)
-- [ ] Step 3 – PDF loading (text + page numbers)
+- [x] Step 3 – PDF loading (text + page numbers)
 - [ ] Step 4 – Chunking
 - [ ] Step 5 – Embeddings + ChromaDB storage
 - [ ] Step 6 – Retrieval (vector search)

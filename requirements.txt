@@ -8,3 +8,8 @@ httpx>=0.27          # required by FastAPI's TestClient
 
 # --- Step 2: configuration ---
 pydantic-settings>=2.4
+
+# --- Step 3: PDF loading ---
+pypdf>=5.0
+langchain-core>=0.3  # Document type shared by all later steps
+fpdf2>=2.7           # only for generating test/sample PDFs
