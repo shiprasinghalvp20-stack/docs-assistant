@@ -17,6 +17,10 @@ class LLMUnavailableError(LLMError):
     """Temporary problem (overloaded, rate-limited, timeout): trying again later may work."""
 
 
+class LLMRateLimitError(LLMUnavailableError):
+    """The provider's quota/rate limit was hit (HTTP 429)."""
+
+
 @lru_cache
 def get_chat_model(model: str):
     """Create a chat model client for the configured provider (created once per model)."""
@@ -48,7 +52,7 @@ def to_llm_error(exc: Exception, model: str) -> LLMError:
     name = type(exc).__name__.lower()
 
     if code == 429 or "RESOURCE_EXHAUSTED" in text or "429" in text:
-        return LLMUnavailableError(
+        return LLMRateLimitError(
             f"Rate limit reached for {model} (free tier). Please wait a minute and try again."
         )
     if code in (500, 502, 503, 504) or "UNAVAILABLE" in text or "timeout" in name or "timed out" in text.lower():

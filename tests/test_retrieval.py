@@ -1,36 +1,10 @@
-import math
-import re
-
 import pytest
 from langchain_core.documents import Document
 
 from app.core.config import get_settings
 from app.services.retrieval import RetrievedChunk, retrieve
 from app.services.vector_store import VectorStore
-
-
-class BagOfWordsEmbeddings:
-    """Fake model where texts sharing words get similar vectors (no download, no API).
-
-    Real models understand meaning; this one only counts words - but that's enough
-    to test ranking, k and the score threshold deterministically.
-    """
-
-    VOCAB = ["leave", "days", "annual", "sick", "remote", "home", "work", "vpn",
-             "expense", "meal", "allowance", "travel", "receipts", "cricket", "cup"]
-
-    def _vec(self, text: str) -> list[float]:
-        words = re.findall(r"[a-z]+", text.lower())
-        v = [float(words.count(w)) for w in self.VOCAB]
-        norm = math.sqrt(sum(x * x for x in v))
-        # Unknown words only -> a vector that's orthogonal to everything (score 0).
-        return [x / norm for x in v] if norm else [0.0] * (len(v) - 1) + [1e-9]
-
-    def embed_documents(self, texts):
-        return [self._vec(t) for t in texts]
-
-    def embed_query(self, text):
-        return self._vec(text)
+from tests.fakes import BagOfWordsEmbeddings
 
 
 CHUNKS = [

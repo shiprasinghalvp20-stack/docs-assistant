@@ -120,8 +120,14 @@ class VectorStore:
 
     def list_sources(self) -> list[str]:
         """Names of all indexed files."""
-        metadatas = self._collection.get(include=["metadatas"])["metadatas"]
-        return sorted({m["source"] for m in metadatas})
+        return sorted(self.source_counts())
+
+    def source_counts(self) -> dict[str, int]:
+        """{file name: number of chunks} for every indexed file, in one query."""
+        counts: dict[str, int] = {}
+        for meta in self._collection.get(include=["metadatas"])["metadatas"]:
+            counts[meta["source"]] = counts.get(meta["source"], 0) + 1
+        return dict(sorted(counts.items()))
 
     def get_chunks(self, source: str) -> list[Document]:
         """All stored chunks of one file, in page/chunk order (handy for inspection)."""

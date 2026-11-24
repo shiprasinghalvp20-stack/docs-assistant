@@ -44,6 +44,7 @@ class Settings(BaseSettings):
     # --- Storage ---
     upload_dir: Path = Path("data/uploads")
     chroma_dir: Path = Path("data/chroma")
+    max_upload_mb: float = Field(default=20, gt=0, le=200)  # larger uploads get HTTP 413
 
     # --- Embeddings + vector store ---
     # Changing the model requires re-indexing: vectors from different models can't be mixed.

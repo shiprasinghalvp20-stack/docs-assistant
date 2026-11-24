@@ -64,6 +64,22 @@ uvicorn app.main:app --reload
 
 Open http://127.0.0.1:8000/docs for the interactive API.
 
+| Method | Path | What it does |
+|---|---|---|
+| `POST` | `/documents` | Upload a PDF (multipart form field `file`); validates, saves to `data/uploads`, indexes it |
+| `GET` | `/documents` | List indexed files and their chunk counts |
+| `POST` | `/ask` | `{"question": "..."}` -> answer, citations, source chunks, model used |
+| `GET` | `/health` | Liveness check |
+
+Status codes: `200` OK · `400` not a valid PDF · `413` file too large · `422` invalid input ·
+`429` LLM rate limit (see `Retry-After`) · `502` LLM rejected our config (e.g. bad key) ·
+`503` LLM temporarily unavailable.
+
+```bash
+curl -X POST http://127.0.0.1:8000/documents -F "file=@samples/company_handbook.pdf"
+curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json"      -d '{"question": "How many holidays do I get?"}'
+```
+
 ## Preview PDF extraction
 
 See exactly what text is extracted from each page of a PDF:
@@ -128,6 +144,6 @@ pytest -v
 - [x] Step 5 – Embeddings + ChromaDB storage (local all-MiniLM-L6-v2)
 - [x] Step 6 – Retrieval (vector search + score threshold)
 - [x] Step 7 – Answer generation with citations (Gemini, citation validation, fallback model)
-- [ ] Step 8 – Upload and Ask API endpoints
+- [x] Step 8 – Upload and Ask API endpoints
 - [ ] Step 9 – Evaluation (retrieval accuracy)
 - [ ] Step 10 – Dockerfile

@@ -1,34 +1,14 @@
 import pytest
-from langchain_core.messages import AIMessage, SystemMessage
+from langchain_core.messages import SystemMessage
 
 from app.services import generation
 from app.services.generation import NOT_FOUND_MESSAGE, Citation, answer_question, validate_citations
-from app.services.llm import LLMError, LLMUnavailableError, to_llm_error
+from app.services.llm import LLMError, LLMRateLimitError, LLMUnavailableError, to_llm_error
 from app.services.retrieval import RetrievedChunk
+from tests.fakes import FakeAPIError, FakeLLM
 
 LEAVE = RetrievedChunk("Employees receive 24 days of paid annual leave.", "handbook.pdf", 1, "handbook.pdf::p1::c0", 0.40)
 EXPENSE = RetrievedChunk("The daily meal allowance is Rs. 1,500.", "handbook.pdf", 4, "handbook.pdf::p4::c0", 0.30)
-
-
-class FakeLLM:
-    """Scripted stand-in for Gemini: returns `reply` (or raises `error`) and records the prompt."""
-
-    def __init__(self, reply: str | list | None = None, error: Exception | None = None):
-        self.reply, self.error, self.calls = reply, error, []
-
-    def invoke(self, messages):
-        self.calls.append(messages)
-        if self.error:
-            raise self.error
-        return AIMessage(content=self.reply)
-
-
-class FakeAPIError(Exception):
-    """Mimics google.genai errors, which carry an HTTP status in `.code`."""
-
-    def __init__(self, code: int, message: str):
-        super().__init__(f"{code} {message}")
-        self.code = code
 
 
 @pytest.fixture
@@ -181,7 +161,7 @@ def test_bad_api_key_fails_fast_without_trying_fallback(chunks):
 
 
 @pytest.mark.parametrize("exc, kind, phrase", [
-    (FakeAPIError(429, "RESOURCE_EXHAUSTED"), LLMUnavailableError, "Rate limit"),
+    (FakeAPIError(429, "RESOURCE_EXHAUSTED"), LLMRateLimitError, "Rate limit"),
     (FakeAPIError(503, "UNAVAILABLE"), LLMUnavailableError, "temporarily unavailable"),
     (TimeoutError("timed out"), LLMUnavailableError, "temporarily unavailable"),
     (FakeAPIError(403, "PERMISSION_DENIED"), LLMError, "rejected the API key"),

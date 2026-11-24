@@ -24,3 +24,6 @@ langchain-huggingface>=0.1
 
 # --- Step 7: answer generation ---
 langchain-google-genai>=2.0
+
+# --- Step 8: API ---
+python-multipart>=0.0.9   # required by FastAPI for file uploads
