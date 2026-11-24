@@ -103,6 +103,16 @@ python -m app.services.retrieval "Can I work from home?" -k 2 --min-score 0
 Returns the top `TOP_K` chunks with file, page and similarity score. Chunks scoring
 below `MIN_SCORE` are dropped, so off-topic questions return nothing.
 
+## Ask a question
+
+```bash
+python -m app.services.generation "How many holidays do I get?"
+```
+
+Needs `GOOGLE_API_KEY` and `LLM_PROVIDER=gemini` in `.env`. Answers cite `[file, p.N]`;
+citations not matching a retrieved chunk are removed, and answers with no valid citation
+are replaced by "I couldn't find this in the documents." Off-topic questions never call the LLM.
+
 ## Test
 
 ```bash
@@ -117,7 +127,7 @@ pytest -v
 - [x] Step 4 – Chunking (RecursiveCharacterTextSplitter)
 - [x] Step 5 – Embeddings + ChromaDB storage (local all-MiniLM-L6-v2)
 - [x] Step 6 – Retrieval (vector search + score threshold)
-- [ ] Step 7 – Answer generation with citations
+- [x] Step 7 – Answer generation with citations (Gemini, citation validation, fallback model)
 - [ ] Step 8 – Upload and Ask API endpoints
 - [ ] Step 9 – Evaluation (retrieval accuracy)
 - [ ] Step 10 – Dockerfile

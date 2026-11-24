@@ -12,7 +12,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Literal
 
-from pydantic import Field, SecretStr, model_validator
+from pydantic import Field, SecretStr, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -29,6 +29,17 @@ class Settings(BaseSettings):
     llm_provider: Literal["groq", "gemini"] = "groq"
     groq_api_key: SecretStr | None = None
     google_api_key: SecretStr | None = None
+    # Free-tier Gemini models (checked Nov 2026). If the main model is overloaded (503)
+    # or rate-limited (429), the fallback is tried. Set LLM_FALLBACK_MODEL=none to disable.
+    llm_model: str = "gemini-3.6-flash"
+    llm_fallback_model: str | None = "gemini-3.5-flash-lite"
+
+    @field_validator("llm_fallback_model")
+    @classmethod
+    def _none_disables_fallback(cls, value: str | None) -> str | None:
+        return None if value is None or value.strip().lower() in ("", "none") else value.strip()
+    llm_timeout: float = Field(default=30.0, gt=0)       # seconds per request
+    llm_max_retries: int = Field(default=1, ge=0, le=5)  # library retries per model
 
     # --- Storage ---
     upload_dir: Path = Path("data/uploads")

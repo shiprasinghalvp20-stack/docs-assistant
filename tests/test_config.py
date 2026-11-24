@@ -8,7 +8,7 @@ from app.core.config import Settings, get_settings
 ENV_VARS = [
     "LLM_PROVIDER", "GROQ_API_KEY", "GOOGLE_API_KEY", "UPLOAD_DIR", "CHROMA_DIR",
     "CHUNK_SIZE", "CHUNK_OVERLAP", "EMBEDDING_MODEL", "COLLECTION_NAME",
-    "TOP_K", "MIN_SCORE",
+    "TOP_K", "MIN_SCORE", "LLM_MODEL", "LLM_FALLBACK_MODEL", "LLM_TIMEOUT", "LLM_MAX_RETRIES",
 ]
 FAKE_KEY = "test-fake-key-123"
 
@@ -114,3 +114,15 @@ def test_invalid_retrieval_settings_fail_at_startup(monkeypatch, name, value):
     monkeypatch.setenv(name, value)
     with pytest.raises(ValidationError):
         make_settings()
+
+
+def test_llm_defaults():
+    s = make_settings()
+    assert s.llm_model == "gemini-3.6-flash"
+    assert s.llm_fallback_model == "gemini-3.5-flash-lite"
+
+
+@pytest.mark.parametrize("value", ["none", "None", "NONE"])
+def test_fallback_model_can_be_disabled(monkeypatch, value):
+    monkeypatch.setenv("LLM_FALLBACK_MODEL", value)
+    assert make_settings().llm_fallback_model is None
