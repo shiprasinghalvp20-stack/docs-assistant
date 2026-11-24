@@ -71,7 +71,7 @@ pytest -v
 ## Roadmap
 
 - [x] Step 1 – Architecture and project skeleton
-- [ ] Step 2 – Configuration from `.env`
+- [x] Step 2 – Configuration from `.env` (pydantic-settings)
 - [ ] Step 3 – PDF loading (text + page numbers)
 - [ ] Step 4 – Chunking
 - [ ] Step 5 – Embeddings + ChromaDB storage
