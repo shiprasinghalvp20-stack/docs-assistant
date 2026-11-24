@@ -195,5 +195,5 @@ def test_error_mapping(exc, kind, phrase):
 
 
 def test_error_message_never_echoes_raw_provider_text():
-    error = to_llm_error(FakeAPIError(400, "API key not valid: AIzaSyFAKE-SECRET-123"), "m")
-    assert "AIzaSyFAKE-SECRET-123" not in str(error)
+    error = to_llm_error(FakeAPIError(400, "API key not valid: FAKE-KEY-NOT-REAL-123"), "m")
+    assert "FAKE-KEY-NOT-REAL-123" not in str(error)
