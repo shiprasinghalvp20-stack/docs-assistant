@@ -1,0 +1,48 @@
+{
+  "description": "Labelled retrieval test set for samples/company_handbook.pdf. Written fresh for evaluation - NOT the questions used to calibrate MIN_SCORE in step 6. Categories: answerable (expected page known), off_topic (nothing should be retrieved), unanswerable (on a related topic but not in the documents - retrieval may legitimately find the related page; the LLM must say 'not found').",
+  "documents": ["samples/company_handbook.pdf"],
+  "questions": [
+    {"id": "a01", "category": "answerable", "question": "How many vacation days are employees entitled to each year?", "expected": [{"source": "company_handbook.pdf", "page": 1}]},
+    {"id": "a02", "category": "answerable", "question": "What is the annual leave allowance?", "expected": [{"source": "company_handbook.pdf", "page": 1}]},
+    {"id": "a03", "category": "answerable", "question": "Can I roll over leave I didn't use to next year?", "expected": [{"source": "company_handbook.pdf", "page": 1}]},
+    {"id": "a04", "category": "answerable", "question": "How many unused leave days can be carried forward?", "expected": [{"source": "company_handbook.pdf", "page": 1}]},
+    {"id": "a05", "category": "answerable", "question": "How much paid sick leave do we get?", "expected": [{"source": "company_handbook.pdf", "page": 1}]},
+    {"id": "a06", "category": "answerable", "question": "When is a medical certificate required?", "expected": [{"source": "company_handbook.pdf", "page": 1}]},
+    {"id": "a07", "category": "answerable", "question": "Do I need a doctor's certificate if I'm ill for three days?", "expected": [{"source": "company_handbook.pdf", "page": 1}]},
+    {"id": "a08", "category": "answerable", "question": "time off policy", "expected": [{"source": "company_handbook.pdf", "page": 1}]},
+
+    {"id": "a09", "category": "answerable", "question": "How many days a week can I work remotely?", "expected": [{"source": "company_handbook.pdf", "page": 2}]},
+    {"id": "a10", "category": "answerable", "question": "Is working from home allowed?", "expected": [{"source": "company_handbook.pdf", "page": 2}]},
+    {"id": "a11", "category": "answerable", "question": "Do I need my manager's permission to work from home?", "expected": [{"source": "company_handbook.pdf", "page": 2}]},
+    {"id": "a12", "category": "answerable", "question": "Must I use a VPN when working outside the office?", "expected": [{"source": "company_handbook.pdf", "page": 2}]},
+    {"id": "a13", "category": "answerable", "question": "What are the core collaboration hours?", "expected": [{"source": "company_handbook.pdf", "page": 2}]},
+    {"id": "a14", "category": "answerable", "question": "When do I have to be available on chat?", "expected": [{"source": "company_handbook.pdf", "page": 2}]},
+    {"id": "a15", "category": "answerable", "question": "remote work rules", "expected": [{"source": "company_handbook.pdf", "page": 2}]},
+    {"id": "a16", "category": "answerable", "question": "Can I work from my house on Fridays?", "expected": [{"source": "company_handbook.pdf", "page": 2}]},
+
+    {"id": "a17", "category": "answerable", "question": "What is the deadline for submitting expense claims?", "expected": [{"source": "company_handbook.pdf", "page": 4}]},
+    {"id": "a18", "category": "answerable", "question": "Do I need receipts to get reimbursed?", "expected": [{"source": "company_handbook.pdf", "page": 4}]},
+    {"id": "a19", "category": "answerable", "question": "How much can I spend on food per day on a business trip?", "expected": [{"source": "company_handbook.pdf", "page": 4}]},
+    {"id": "a20", "category": "answerable", "question": "Who must approve a large expense claim?", "expected": [{"source": "company_handbook.pdf", "page": 4}]},
+    {"id": "a21", "category": "answerable", "question": "What happens if my claim is above 25,000 rupees?", "expected": [{"source": "company_handbook.pdf", "page": 4}]},
+    {"id": "a22", "category": "answerable", "question": "How do I get reimbursed for travel costs?", "expected": [{"source": "company_handbook.pdf", "page": 4}]},
+    {"id": "a23", "category": "answerable", "question": "daily food allowance", "expected": [{"source": "company_handbook.pdf", "page": 4}]},
+    {"id": "a24", "category": "answerable", "question": "How long after buying something can I claim the money back?", "expected": [{"source": "company_handbook.pdf", "page": 4}]},
+
+    {"id": "o01", "category": "off_topic", "question": "Who won the cricket world cup?", "expected": []},
+    {"id": "o02", "category": "off_topic", "question": "What is the capital of Japan?", "expected": []},
+    {"id": "o03", "category": "off_topic", "question": "How do I cook pasta?", "expected": []},
+    {"id": "o04", "category": "off_topic", "question": "What will the weather be like tomorrow?", "expected": []},
+    {"id": "o05", "category": "off_topic", "question": "Explain quantum computing in simple terms.", "expected": []},
+    {"id": "o06", "category": "off_topic", "question": "Write a poem about the sea.", "expected": []},
+    {"id": "o07", "category": "off_topic", "question": "What is Apple's stock price?", "expected": []},
+    {"id": "o08", "category": "off_topic", "question": "How do I reverse a list in Python?", "expected": []},
+
+    {"id": "u01", "category": "unanswerable", "question": "What is the maternity leave policy?", "expected": []},
+    {"id": "u02", "category": "unanswerable", "question": "Is there a dress code at the office?", "expected": []},
+    {"id": "u03", "category": "unanswerable", "question": "Does the company provide health insurance?", "expected": []},
+    {"id": "u04", "category": "unanswerable", "question": "Who is the CEO of Example Corp?", "expected": []},
+    {"id": "u05", "category": "unanswerable", "question": "On which day of the month is salary paid?", "expected": []},
+    {"id": "u06", "category": "unanswerable", "question": "What is the office address?", "expected": []}
+  ]
+}

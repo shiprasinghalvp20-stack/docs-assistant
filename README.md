@@ -39,7 +39,7 @@ app/
 scripts/          helper scripts (e.g. make_sample_pdf.py)
 samples/          small fictional PDF for demos and tests
 tests/             pytest tests
-eval/              retrieval accuracy evaluation
+eval/             labelled questions + retrieval evaluation (see eval/README.md)
 data/uploads/      uploaded PDFs (git-ignored)
 data/chroma/       vector database files (git-ignored)
 ```
@@ -129,6 +129,15 @@ Needs `GOOGLE_API_KEY` and `LLM_PROVIDER=gemini` in `.env`. Answers cite `[file,
 citations not matching a retrieved chunk are removed, and answers with no valid citation
 are replaced by "I couldn't find this in the documents." Off-topic questions never call the LLM.
 
+## Evaluate retrieval
+
+```bash
+python -m eval.run_eval
+```
+
+Compares chunk sizes and `MIN_SCORE` values on a labelled question set (Hit Rate@k, MRR,
+off-topic rejection). Retrieval only, so no LLM calls and no cost. Results and findings: [eval/README.md](eval/README.md).
+
 ## Test
 
 ```bash
@@ -145,5 +154,5 @@ pytest -v
 - [x] Step 6 – Retrieval (vector search + score threshold)
 - [x] Step 7 – Answer generation with citations (Gemini, citation validation, fallback model)
 - [x] Step 8 – Upload and Ask API endpoints
-- [ ] Step 9 – Evaluation (retrieval accuracy)
+- [x] Step 9 – Evaluation (Hit Rate@k, MRR, off-topic rejection)
 - [ ] Step 10 – Dockerfile
