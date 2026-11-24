@@ -39,6 +39,12 @@ class Settings(BaseSettings):
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     collection_name: str = "docs"
 
+    # --- Retrieval ---
+    top_k: int = Field(default=4, gt=0, le=50)  # max chunks returned per question
+    # Cosine similarity cut-off (-1..1). Calibrated for all-MiniLM-L6-v2 on the sample
+    # handbook: on-topic best scores 0.31-0.51, off-topic <= 0.17. Re-measure if the model changes.
+    min_score: float = Field(default=0.25, ge=-1.0, le=1.0)
+
     # --- Chunking (measured in characters) ---
     # Field(gt=0) / ge=0 = pydantic rejects zero or negative values at startup.
     chunk_size: int = Field(default=800, gt=0)

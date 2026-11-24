@@ -93,6 +93,16 @@ Vectors are saved in `data/chroma`. Re-running on an unchanged file is skipped;
 a changed file with the same name replaces its old chunks.
 The first run downloads the embedding model (~90 MB) once; after that it loads offline.
 
+## Search the indexed documents
+
+```bash
+python -m app.services.retrieval "How many holidays do I get?"
+python -m app.services.retrieval "Can I work from home?" -k 2 --min-score 0
+```
+
+Returns the top `TOP_K` chunks with file, page and similarity score. Chunks scoring
+below `MIN_SCORE` are dropped, so off-topic questions return nothing.
+
 ## Test
 
 ```bash
@@ -106,7 +116,7 @@ pytest -v
 - [x] Step 3 – PDF loading (text + page numbers)
 - [x] Step 4 – Chunking (RecursiveCharacterTextSplitter)
 - [x] Step 5 – Embeddings + ChromaDB storage (local all-MiniLM-L6-v2)
-- [ ] Step 6 – Retrieval (vector search)
+- [x] Step 6 – Retrieval (vector search + score threshold)
 - [ ] Step 7 – Answer generation with citations
 - [ ] Step 8 – Upload and Ask API endpoints
 - [ ] Step 9 – Evaluation (retrieval accuracy)

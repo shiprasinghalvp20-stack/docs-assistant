@@ -76,6 +76,31 @@ class VectorStore:
             self._collection.delete(ids=ids)
         return len(ids)
 
+    # ---------- search ----------
+
+    def search(self, query: str, k: int) -> list[tuple[Document, float]]:
+        """Return up to k (chunk, score) pairs, most similar first.
+
+        score = cosine similarity in [-1, 1] (1 = same meaning). ChromaDB returns cosine
+        *distance* (0 = identical), so score = 1 - distance.
+        The query is embedded with the SAME model as the stored chunks - required for
+        the vectors to be comparable.
+        """
+        total = self.count()
+        if total == 0:
+            return []
+        result = self._collection.query(
+            query_embeddings=[self.embeddings.embed_query(query)],
+            n_results=min(k, total),
+            include=["documents", "metadatas", "distances"],
+        )
+        return [
+            (Document(page_content=text, metadata=meta), 1.0 - distance)
+            for text, meta, distance in zip(
+                result["documents"][0], result["metadatas"][0], result["distances"][0]
+            )
+        ]
+
     # ---------- read ----------
 
     def count(self) -> int:

@@ -8,6 +8,7 @@ from app.core.config import Settings, get_settings
 ENV_VARS = [
     "LLM_PROVIDER", "GROQ_API_KEY", "GOOGLE_API_KEY", "UPLOAD_DIR", "CHROMA_DIR",
     "CHUNK_SIZE", "CHUNK_OVERLAP", "EMBEDDING_MODEL", "COLLECTION_NAME",
+    "TOP_K", "MIN_SCORE",
 ]
 FAKE_KEY = "test-fake-key-123"
 
@@ -37,6 +38,8 @@ def test_defaults_when_nothing_is_set():
     assert s.chunk_overlap == 120
     assert s.embedding_model == "sentence-transformers/all-MiniLM-L6-v2"
     assert s.collection_name == "docs"
+    assert s.top_k == 4
+    assert s.min_score == 0.25
 
 
 def test_environment_variables_override_defaults(monkeypatch):
@@ -99,5 +102,15 @@ def test_chunk_settings_are_converted_to_int(monkeypatch):
 def test_invalid_chunk_settings_fail_at_startup(monkeypatch, size, overlap):
     monkeypatch.setenv("CHUNK_SIZE", size)
     monkeypatch.setenv("CHUNK_OVERLAP", overlap)
+    with pytest.raises(ValidationError):
+        make_settings()
+
+
+@pytest.mark.parametrize("name, value", [
+    ("TOP_K", "0"), ("TOP_K", "51"), ("TOP_K", "abc"),
+    ("MIN_SCORE", "1.5"), ("MIN_SCORE", "-2"), ("MIN_SCORE", "high"),
+])
+def test_invalid_retrieval_settings_fail_at_startup(monkeypatch, name, value):
+    monkeypatch.setenv(name, value)
     with pytest.raises(ValidationError):
         make_settings()
