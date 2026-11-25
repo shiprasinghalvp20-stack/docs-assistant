@@ -1,29 +1,23 @@
-# We add libraries step by step, as each feature needs them.
+# Runtime dependencies (what the app needs to run - this is what goes into the Docker image).
+# Development tools (tests, sample-PDF generation) are in requirements-dev.txt.
 
-# --- Step 1: web API + testing ---
+# Web API
 fastapi>=0.115
 uvicorn[standard]>=0.30
-pytest>=8.0
-httpx>=0.27          # required by FastAPI's TestClient
+python-multipart>=0.0.9      # required by FastAPI for file uploads
 
-# --- Step 2: configuration ---
+# Configuration
 pydantic-settings>=2.4
 
-# --- Step 3: PDF loading ---
+# PDF loading + chunking
 pypdf>=5.0
-langchain-core>=0.3  # Document type shared by all later steps
-fpdf2>=2.7           # only for generating test/sample PDFs
-
-# --- Step 4: chunking ---
+langchain-core>=0.3          # Document type shared by all steps
 langchain-text-splitters>=0.3
 
-# --- Step 5: embeddings + vector store ---
+# Embeddings + vector store
 chromadb>=0.5
-sentence-transformers>=3.0   # pulls in PyTorch (large download)
+sentence-transformers>=3.0   # pulls in PyTorch (large; the Dockerfile installs a CPU-only build)
 langchain-huggingface>=0.1
 
-# --- Step 7: answer generation ---
+# Answer generation
 langchain-google-genai>=2.0
-
-# --- Step 8: API ---
-python-multipart>=0.0.9   # required by FastAPI for file uploads

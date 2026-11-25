@@ -26,22 +26,26 @@ Built with Retrieval-Augmented Generation (RAG).
 
 ## Tech stack
 
-Python · FastAPI · LangChain · ChromaDB · Groq / Gemini · pytest · Docker
+Python 3.12 · FastAPI · LangChain · ChromaDB · sentence-transformers (local embeddings) · Google Gemini (answers) · pytest · Docker
 
 ## Project structure
 
 ```
 app/
-  main.py          FastAPI app entry point
-  api/             HTTP routes (thin layer)
-  core/            configuration (reads .env)
-  services/        ingestion, retrieval, generation logic
-scripts/          helper scripts (e.g. make_sample_pdf.py)
-samples/          small fictional PDF for demos and tests
-tests/             pytest tests
-eval/             labelled questions + retrieval evaluation (see eval/README.md)
-data/uploads/      uploaded PDFs (git-ignored)
-data/chroma/       vector database files (git-ignored)
+  main.py              FastAPI app entry point
+  api/                 HTTP routes + Pydantic request/response models
+  core/config.py       settings, read from environment / .env
+  services/            pdf_loader, chunker, embeddings, vector_store, ingestion,
+                       retrieval, llm, generation, uploads
+  evaluation.py        retrieval metrics (Hit Rate@k, MRR, rejection)
+tests/                 pytest tests (fake embeddings + fake LLM, no network)
+eval/                  labelled questions + evaluation script (see eval/README.md)
+scripts/               helper scripts (make_sample_pdf.py)
+samples/               small fictional PDF for demos and tests
+data/                  uploads + vector DB at runtime (git-ignored)
+Dockerfile, docker-compose.yml, .dockerignore
+requirements.txt       runtime dependencies (used by the Docker image)
+requirements-dev.txt   runtime + test/dev tools
 ```
 
 ## Setup
@@ -52,7 +56,7 @@ Requires **Python 3.11 or 3.12**.
 python -m venv .venv
 # Windows:      .venv\Scripts\activate
 # macOS/Linux:  source .venv/bin/activate
-pip install -r requirements.txt
+pip install -r requirements-dev.txt
 cp .env.example .env      # then put your API keys in .env
 ```
 
@@ -79,6 +83,33 @@ Status codes: `200` OK · `400` not a valid PDF · `413` file too large · `422`
 curl -X POST http://127.0.0.1:8000/documents -F "file=@samples/company_handbook.pdf"
 curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json"      -d '{"question": "How many holidays do I get?"}'
 ```
+
+## Run with Docker
+
+Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/). Create `.env` first
+(`cp .env.example .env`) and add your `GOOGLE_API_KEY`. The key is read when the container
+**starts**: it is never built into the image, and `.dockerignore` keeps `.env` out of it.
+
+```bash
+docker compose up --build -d     # build the image and start in the background
+docker compose ps                # STATUS should become "healthy"
+docker compose logs -f api       # follow logs (Ctrl+C to stop following)
+docker compose down              # stop (uploads + vectors are kept in the docs-data volume)
+docker compose down -v           # stop AND delete all uploaded data
+```
+
+Then open http://localhost:8000/docs. Uploaded PDFs and the vector database live in the
+named volume `docs-data`, so they survive restarts and image upgrades.
+
+Without Compose:
+
+```bash
+docker build -t docs-assistant .
+docker run --env-file .env -p 8000:8000 -v docs-data:/app/data docs-assistant
+```
+
+The image is CPU-only. The embedding model is downloaded at build time, so the container
+starts offline, and the app runs as a non-root user with a `/health` healthcheck.
 
 ## Preview PDF extraction
 
@@ -155,4 +186,4 @@ pytest -v
 - [x] Step 7 – Answer generation with citations (Gemini, citation validation, fallback model)
 - [x] Step 8 – Upload and Ask API endpoints
 - [x] Step 9 – Evaluation (Hit Rate@k, MRR, off-topic rejection)
-- [ ] Step 10 – Dockerfile
+- [x] Step 10 – Dockerfile + docker-compose (CPU-only, model baked in, volume, healthcheck)

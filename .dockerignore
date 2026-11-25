@@ -1,0 +1,28 @@
+# Keep the build context small and secrets out of the image.
+
+# Secrets - never copied into an image
+.env
+.env.*
+!.env.example
+
+# Local environment, caches, runtime data (data lives in a volume instead)
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+data/
+
+# Not needed to run the app
+.git/
+.gitignore
+.vscode/
+.idea/
+tests/
+eval/
+scripts/
+samples/
+*.md
+Dockerfile
+docker-compose.yml
+.dockerignore

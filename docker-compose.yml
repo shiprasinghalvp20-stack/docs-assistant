@@ -1,0 +1,20 @@
+# One command to build and run:   docker compose up --build
+# Stop:                           docker compose down      (data is kept in the volume)
+# Delete data too:                docker compose down -v
+services:
+  api:
+    build: .
+    image: docs-assistant:latest
+    ports:
+      - "8000:8000"          # host:container -> http://localhost:8000/docs
+    env_file:
+      - .env                 # API key and settings are read at RUNTIME, never built into the image
+    environment:
+      UPLOAD_DIR: /app/data/uploads
+      CHROMA_DIR: /app/data/chroma
+    volumes:
+      - docs-data:/app/data  # uploads + vectors survive container restarts and upgrades
+    restart: unless-stopped
+
+volumes:
+  docs-data:
