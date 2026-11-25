@@ -1,0 +1,10 @@
+# Loaded when Streamlit is started from the ui/ folder (as the README and Dockerfile do).
+[browser]
+gatherUsageStats = false   # Streamlit sends anonymous usage statistics by default - turn it off
+
+[server]
+headless = true            # don't try to open a browser (needed in Docker)
+maxUploadSize = 20         # MB - matches the API's MAX_UPLOAD_MB default
+
+[theme]
+primaryColor = "#4F46E5"

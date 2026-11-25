@@ -1,0 +1,3 @@
+# The UI only talks HTTP to the API - no PyTorch, ChromaDB or API keys needed here.
+streamlit>=1.40
+httpx>=0.27

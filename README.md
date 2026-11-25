@@ -1,7 +1,7 @@
 # Docs Assistant
 
 Upload PDFs, ask questions in plain English, and get answers with **file and page citations**.
-Built with Retrieval-Augmented Generation (RAG).
+Built with Retrieval-Augmented Generation (RAG). Comes with a REST API (FastAPI) and a chat UI (Streamlit).
 
 ## Architecture
 
@@ -26,7 +26,7 @@ Built with Retrieval-Augmented Generation (RAG).
 
 ## Tech stack
 
-Python 3.12 · FastAPI · LangChain · ChromaDB · sentence-transformers (local embeddings) · Google Gemini (answers) · pytest · Docker
+Python 3.12 · FastAPI · LangChain · ChromaDB · sentence-transformers (local embeddings) · Google Gemini (answers) · Streamlit (UI) · pytest · Docker
 
 ## Project structure
 
@@ -40,6 +40,7 @@ app/
   evaluation.py        retrieval metrics (Hit Rate@k, MRR, rejection)
 tests/                 pytest tests (fake embeddings + fake LLM, no network)
 eval/                  labelled questions + evaluation script (see eval/README.md)
+ui/                    Streamlit chat UI (app.py) + API client (api_client.py) + its Dockerfile
 scripts/               helper scripts (make_sample_pdf.py)
 samples/               small fictional PDF for demos and tests
 data/                  uploads + vector DB at runtime (git-ignored)
@@ -84,6 +85,35 @@ curl -X POST http://127.0.0.1:8000/documents -F "file=@samples/company_handbook.
 curl -X POST http://127.0.0.1:8000/ask -H "Content-Type: application/json"      -d '{"question": "How many holidays do I get?"}'
 ```
 
+## Screenshots
+
+<!-- Take these from the running UI (see docs/screenshots/README.md), save them in
+     docs/screenshots/, then remove the comment markers around the two image lines below. -->
+<!--
+![Chat: answer with citation and sources](docs/screenshots/ui-chat.png)
+![Sidebar: upload status and indexed files](docs/screenshots/ui-upload.png)
+-->
+
+*Screenshots coming soon. See [docs/screenshots/README.md](docs/screenshots/README.md).*
+
+## Web UI (Streamlit)
+
+A chat page that talks to the API over HTTP. It needs no API key and no ML libraries.
+
+- **Sidebar:** API status, upload a PDF (with status and chunk count), list of indexed files
+- **Chat:** ask questions, get answers with `[file, p.N]` citations, and expand **Sources** to see the retrieved chunks with page and similarity score
+- **Friendly messages** for "not found", rate limits (429), the model being overloaded (503) and the API being down
+- **Chat history** is kept while the browser tab is open
+
+Run locally (the API must be running on port 8000):
+
+```bash
+cd ui
+streamlit run app.py        # opens http://localhost:8501
+```
+
+The API address comes from the `API_URL` environment variable (default `http://localhost:8000`).
+
 ## Run with Docker
 
 Requires [Docker Desktop](https://www.docker.com/products/docker-desktop/). Create `.env` first
@@ -98,8 +128,16 @@ docker compose down              # stop (uploads + vectors are kept in the docs-
 docker compose down -v           # stop AND delete all uploaded data
 ```
 
-Then open http://localhost:8000/docs. Uploaded PDFs and the vector database live in the
-named volume `docs-data`, so they survive restarts and image upgrades.
+This starts **two services**:
+
+| Service | URL | What it is |
+|---|---|---|
+| `ui` | http://localhost:8501 | Streamlit chat UI |
+| `api` | http://localhost:8000/docs | FastAPI backend (interactive API docs) |
+
+The UI waits until the API is healthy, then reaches it at `http://api:8000`, using the Compose
+service name. Uploaded PDFs and the vector database live in the named volume `docs-data`, so
+they survive restarts and image upgrades. Only the `api` container receives `.env`.
 
 Without Compose:
 
@@ -187,3 +225,4 @@ pytest -v
 - [x] Step 8 – Upload and Ask API endpoints
 - [x] Step 9 – Evaluation (Hit Rate@k, MRR, off-topic rejection)
 - [x] Step 10 – Dockerfile + docker-compose (CPU-only, model baked in, volume, healthcheck)
+- [x] Step 11 – Streamlit chat UI (second Compose service)

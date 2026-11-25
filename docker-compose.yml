@@ -1,12 +1,14 @@
-# One command to build and run:   docker compose up --build
-# Stop:                           docker compose down      (data is kept in the volume)
-# Delete data too:                docker compose down -v
+# One command starts both services:   docker compose up --build -d
+#   UI  -> http://localhost:8501
+#   API -> http://localhost:8000/docs
+# Stop:             docker compose down      (data is kept in the volume)
+# Delete data too:  docker compose down -v
 services:
   api:
     build: .
     image: docs-assistant:latest
     ports:
-      - "8000:8000"          # host:container -> http://localhost:8000/docs
+      - "8000:8000"          # host:container
     env_file:
       - .env                 # API key and settings are read at RUNTIME, never built into the image
     environment:
@@ -14,6 +16,20 @@ services:
       CHROMA_DIR: /app/data/chroma
     volumes:
       - docs-data:/app/data  # uploads + vectors survive container restarts and upgrades
+    restart: unless-stopped
+
+  ui:
+    build: ./ui
+    image: docs-assistant-ui:latest
+    ports:
+      - "8501:8501"
+    environment:
+      # Inside Compose, services reach each other by service name: "api", not "localhost"
+      # (localhost would mean the UI container itself). The UI needs no API key.
+      API_URL: http://api:8000
+    depends_on:
+      api:
+        condition: service_healthy   # wait until the API's healthcheck passes
     restart: unless-stopped
 
 volumes:
