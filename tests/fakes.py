@@ -1,6 +1,7 @@
 """Fake embedding model and fake LLM shared by several test files (no downloads, no API)."""
 import math
 import re
+import zlib
 
 from langchain_core.messages import AIMessage
 
@@ -14,13 +15,18 @@ class BagOfWordsEmbeddings:
 
     VOCAB = ["leave", "days", "annual", "sick", "remote", "home", "work", "vpn",
              "expense", "meal", "allowance", "travel", "receipts", "cricket", "cup"]
+    EXTRA_SLOTS = 64  # separate dimensions for texts containing no VOCAB word
 
     def _vec(self, text: str) -> list[float]:
         words = re.findall(r"[a-z]+", text.lower())
-        v = [float(words.count(w)) for w in self.VOCAB]
+        v = [float(words.count(w)) for w in self.VOCAB] + [0.0] * self.EXTRA_SLOTS
         norm = math.sqrt(sum(x * x for x in v))
-        # Unknown words only -> a vector that's orthogonal to everything (score 0).
-        return [x / norm for x in v] if norm else [0.0] * (len(v) - 1) + [1e-9]
+        if norm:
+            return [x / norm for x in v]
+        # No known words: put the text in its own extra slot (stable hash of the text), so it is
+        # orthogonal to every text that has known words (score 0) instead of colliding with one.
+        v[len(self.VOCAB) + zlib.crc32(text.encode()) % self.EXTRA_SLOTS] = 1.0
+        return v
 
     def embed_documents(self, texts):
         return [self._vec(t) for t in texts]

@@ -19,8 +19,8 @@ def upload_dir(tmp_path, monkeypatch):
     """Point uploads at a temp folder and pin settings, so the real .env can't affect tests."""
     folder = tmp_path / "uploads"
     monkeypatch.setenv("UPLOAD_DIR", str(folder))
-    monkeypatch.setenv("CHUNK_SIZE", "800")
-    monkeypatch.setenv("CHUNK_OVERLAP", "120")
+    monkeypatch.setenv("CHUNK_SIZE", "200")
+    monkeypatch.setenv("CHUNK_OVERLAP", "40")
     monkeypatch.setenv("MIN_SCORE", "0.25")
     monkeypatch.setenv("TOP_K", "4")
     monkeypatch.setenv("MAX_UPLOAD_MB", "20")
@@ -57,7 +57,7 @@ def test_upload_indexes_pdf(client, upload_dir):
     assert body["filename"] == "company_handbook.pdf"
     assert body["status"] == "indexed"
     assert body["pages_with_text"] == 3
-    assert body["chunks"] == 3
+    assert body["chunks"] == 6
     assert (upload_dir / "company_handbook.pdf").exists()
 
 
@@ -118,8 +118,8 @@ def test_list_documents_empty_then_filled(client):
     assert client.get("/documents").json() == {"documents": [], "total_chunks": 0}
     upload(client)
     assert client.get("/documents").json() == {
-        "documents": [{"filename": "company_handbook.pdf", "chunks": 3}],
-        "total_chunks": 3,
+        "documents": [{"filename": "company_handbook.pdf", "chunks": 6}],
+        "total_chunks": 6,
     }
 
 

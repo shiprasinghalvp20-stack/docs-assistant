@@ -58,9 +58,11 @@ class Settings(BaseSettings):
     min_score: float = Field(default=0.25, ge=-1.0, le=1.0)
 
     # --- Chunking (measured in characters) ---
+    # 200/40 chosen by the step 9 evaluation (eval/README.md): 100% Hit@4 and off-topic
+    # rejection with MIN_SCORE=0.25, and a wider score gap than 800/120.
     # Field(gt=0) / ge=0 = pydantic rejects zero or negative values at startup.
-    chunk_size: int = Field(default=800, gt=0)
-    chunk_overlap: int = Field(default=120, ge=0)
+    chunk_size: int = Field(default=200, gt=0)
+    chunk_overlap: int = Field(default=40, ge=0)
 
     @model_validator(mode="after")
     def _overlap_smaller_than_size(self) -> "Settings":

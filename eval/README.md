@@ -62,3 +62,9 @@ To evaluate your own PDFs, copy the format, list your PDFs under `documents`, an
 ### Caveat
 The sample has only three short pages and 38 questions, and each question carries 2.6 percentage points.
 Re-run this evaluation on your real documents before trusting any setting.
+
+### Decision (2026-11-25)
+The defaults were changed to **CHUNK_SIZE=200, CHUNK_OVERLAP=40** (MIN_SCORE stays 0.25).
+After re-indexing, the evaluation reports **0 mistakes** with these settings: 100% Hit@4 and 100% off-topic rejection.
+100/20 scored best on the numbers, but 100-character chunks are single sentences that lose context, and that hurts
+answer quality, which this retrieval-only evaluation doesn't measure. 200/40 keeps one or two full sentences per chunk.

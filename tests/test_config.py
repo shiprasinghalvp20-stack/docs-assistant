@@ -34,8 +34,8 @@ def test_defaults_when_nothing_is_set():
     assert s.groq_api_key is None
     assert s.upload_dir == Path("data/uploads")
     assert s.chroma_dir == Path("data/chroma")
-    assert s.chunk_size == 800
-    assert s.chunk_overlap == 120
+    assert s.chunk_size == 200
+    assert s.chunk_overlap == 40
     assert s.embedding_model == "sentence-transformers/all-MiniLM-L6-v2"
     assert s.collection_name == "docs"
     assert s.top_k == 4
